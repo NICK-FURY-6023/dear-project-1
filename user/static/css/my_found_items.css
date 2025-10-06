@@ -1,0 +1,223 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.links a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+    font-size: 16px;
+    padding: 10px;
+    transition: 0.3s;
+}
+
+.links a:hover {
+    background: #3498db;
+    border-radius: 5px;
+}
+
+/* My Items Section */
+.my-items {
+    text-align: center;
+    padding: 40px;
+    background: white;
+}
+
+.my-items h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Item Cards */
+.items-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.item-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 250px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, box-shadow 0.3s;
+    text-align: center;
+    position: relative;
+}
+
+.item-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.item-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Buttons */
+/* Updated Button Styles */
+.card-actions {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 10px; /* Adds spacing between buttons */
+    margin-top: 15px;
+}
+
+.edit-btn, .delete-btn, .claimed-btn, .response-btn {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: 0.3s;
+    width: 100%; /* Makes buttons full width inside the card */
+}
+
+.edit-btn {
+    background: #f1c40f;
+    color: black;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.claimed-btn {
+    background: #27ae60;
+    color: white;
+}
+
+.response-btn {
+    background: #3498db;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #f39c12;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+.claimed-btn:hover {
+    background: #2ecc71;
+}
+
+.response-btn:hover {
+    background: #2980b9;
+}
+
+/* Responsive Fix */
+@media (min-width: 768px) {
+    .card-actions {
+        flex-direction: row; /* Align buttons in a row on larger screens */
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .edit-btn, .delete-btn, .claimed-btn, .response-btn {
+        width: auto; /* Prevents buttons from being full width on large screens */
+        flex: 1; /* Makes them take equal space */
+    }
+}
+
+
+.response-list {
+    background: #f4f4f4;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.response-list h3 {
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.response-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.response-list li {
+    padding: 8px;
+    background: white;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.response-list li:hover {
+    background: #ddd;
+}
+.chat-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: none;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #007bff;
+    color: white;
+    padding: 8px;
+    border-radius: 10px 10px 0 0;
+}
+
+.chat-messages {
+    height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#chat-input {
+    width: 75%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    cursor: pointer;
+    padding: 5px 10px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+}

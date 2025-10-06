@@ -17,6 +17,12 @@
             <a href="{% url 'home' %}">Home</a>
             <a href="{% url 'report_found' %}" class="active">Report Found Item</a>
             <a href="{% url 'view_found' %}" >View Found Items</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'my_found_items' %}">My Items</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
         </nav>
     </header>
 

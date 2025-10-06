@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f0f0f0"/>
+  
+  <!-- Image icon -->
+  <rect x="100" y="75" width="200" height="150" rx="10" fill="#fff" stroke="#ccc" stroke-width="2"/>
+  
+  <!-- Mountain/Photo icon -->
+  <path d="M 120 180 L 160 140 L 200 170 L 240 130 L 280 180 Z" fill="#e0e0e0"/>
+  <circle cx="160" cy="120" r="15" fill="#d0d0d0"/>
+  
+  <!-- "No Image" text -->
+  <text x="200" y="245" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="#999">No Image Available</text>
+</svg>

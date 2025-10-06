@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Wallet Icon -->
+  <rect x="30" y="50" width="140" height="100" rx="10" fill="#4A90E2" stroke="#2E5C8A" stroke-width="3"/>
+  <rect x="30" y="65" width="140" height="20" fill="#2E5C8A"/>
+  <circle cx="150" cy="110" r="8" fill="#FFD700"/>
+  <line x1="50" y1="100" x2="130" y2="100" stroke="#E0E0E0" stroke-width="2"/>
+  <line x1="50" y1="120" x2="110" y2="120" stroke="#E0E0E0" stroke-width="2"/>
+  <text x="100" y="180" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#333">Wallet</text>
+</svg>

@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found Portal - College</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <script defer src="{% static 'js/script.js' %}"></script>
+</head>
+<body>
+
+    <!-- HEADER SECTION -->
+    <header>
+        <div class="logo">Lost & Found Portal</div>
+        <nav class="links">
+            <a href="{% url 'home' %}" class="active">Home</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'report_found' %}">Report Found</a>
+                <a href="{% url 'view_found' %}">View Found</a>
+            {% else %}
+                <a href="#" onclick="alert('Please sign in to report your items.')">Report Found</a>
+                <a href="#" onclick="alert('Please sign in to report your items.')">View Found</a>
+            {% endif %}
+            <a href="#">About Us</a>
+            <a href="#">Contact Us</a>
+    
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" onclick="return confirmLogout();">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+    
+
+    <!-- INTRO SECTION -->
+    <section class="intro">
+        <h2>Lost Something on Campus? Don't Panic!</h2>
+        <p>"Every lost item has a story; let’s help it find its way back!"</p>
+    </section>
+
+    <!-- REPORT FOUND & SEARCH LOST SECTION -->
+    <section class="report-section">
+        <div class="box">
+            <h3>📢 Found something in the library, cafeteria, or classroom?</h3>
+            <p>Help your fellow students by reporting it.</p>
+            <a href="#" class="btn report-btn">Report Found</a>
+        </div>
+        <div class="box">
+            <h3>🔍 Lost your ID card, books, or project file?</h3>
+            <p>Check the found items list—you might just get lucky!</p>
+            <a href="#" class="btn view-btn">View Found Items</a>
+        </div>
+    </section>
+
+    <!-- RECENTLY FOUND ITEMS -->
+    <section class="recent-items">
+        <h2>Recently Found Items 🔥</h2>
+        <div class="items-container">
+            <div class="item-card">
+                <img src="{% static 'images/wallet.png' %}" alt="Lost Wallet">
+                <p><strong>Found: </strong> Wallet near Library</p>
+                <p>📅 2 Days Ago | 📍 Library</p>
+                <button class="claim-btn">Claim</button>
+            </div>
+            <div class="item-card">
+                <img src="{% static 'images/idcard.png' %}" alt="Lost ID Card">
+                <p><strong>Found: </strong> ID Card near Cafeteria</p>
+                <p>📅 1 Day Ago | 📍 Cafeteria</p>
+                <button class="claim-btn">Claim</button>
+            </div>
+            <div class="item-card">
+                <img src="{% static 'images/bag.png' %}" alt="Lost Bag">
+                <p><strong>Found: </strong> Bag near Classroom</p>
+                <p>📅 3 Days Ago | 📍 Room 105</p>
+                <button class="claim-btn">Claim</button>
+            </div>
+        </div>
+    </section>
+    
+<!-- HOW IT WORKS SECTION -->
+<section class="how-it-works">
+    <h2>How It Works</h2>
+    <div class="steps">
+        <div class="step">
+            <p>📌 Report Found</p>
+            <p>Submit details of any found item.</p>
+        </div>
+        <div class="arrow">➡</div>
+        <div class="step">
+            <p>🔎 Search</p>
+            <p>Browse through the found items list.</p>
+        </div>
+        <div class="arrow">➡</div>
+        <div class="step">
+            <p>💬 Claim</p>
+            <p>Submit a request to claim your item.</p>
+        </div>
+        <div class="arrow">➡</div>
+        <div class="step">
+            <p>✅ Verification</p>
+            <p>Describe the item to confirm ownership.</p>
+        </div>
+        <div class="arrow">➡</div>
+        <div class="step">
+            <p>💬 Connect</p>
+            <p>Arrange to meet and retrieve your item.</p>
+        </div>
+    </div>
+</section>
+    
+<!-- SIDE MENU (RIGHT SIDE) -->
+<div class="side-menu" id="sideMenu">
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    <div class="menu-content">
+        <p class="menu-user">Hi, {{ user.username }}</p>
+
+        <a href="{% url 'my_found_items' %}">My Found Items</a>
+        <a href="{% url 'view_found' %}"> My Claims</a>
+        <a href="#">ℹ️ About Us</a>
+        <a href="#">📞 Contact Us</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" onclick="return confirmLogout();">🚪 Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">🔑 Login</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function toggleMenu() {
+        let sideMenu = document.getElementById("sideMenu");
+        let menuToggle = document.getElementById("menuToggle");
+
+        sideMenu.classList.toggle("active");
+
+        // Change icon based on menu state
+        if (sideMenu.classList.contains("active")) {
+            menuToggle.innerHTML = "❌"; // Cross icon when menu is open
+        } else {
+            menuToggle.innerHTML = "☰"; // Hamburger menu when closed
+        }
+    }
+
+    function confirmLogout() {
+        return confirm("Are you sure you want to log out?");
+    }
+</script>
+
+<footer>
+    <p>&copy; 2025 Lost & Found Portal | <a href="#">About Us</a> | <a href="#">Contact</a></p>
+</footer>
+
+
+</body>
+</html>

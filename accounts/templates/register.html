@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Lost & Found Portal</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="logo">Lost & Found Portal</div>
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="#">About Us</a>
+            <a href="#">Contact Us</a>
+        </nav>
+    </header>
+
+    <!-- Register Section -->
+    <section class="register-section">
+        <div class="register-box">
+            <h2>Register</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="email">College Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                </div>
+
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p class="login-text">Already have an account? <a href="{% url 'login' %}" id="loginLink">Login here</a></p>
+        </div>
+    </section>
+
+    <!-- Verification Popups -->
+    {% if show_verification_sent_popup %}
+    <div class="popup" id="verificationSentPopup">
+        <div class="popup-content">
+            <p>✅ Verification email sent! Please check your inbox.</p>
+            <button onclick="closePopup('verificationSentPopup')">OK</button>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if show_verification_success_popup %}
+    <div class="popup" id="verificationSuccessPopup">
+        <div class="popup-content">
+            <p>✅ Email verified successfully! You can now log in.</p>
+            <button onclick="closePopup('verificationSuccessPopup')">OK</button>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if show_verification_failed_popup %}
+    <div class="popup" id="verificationFailedPopup">
+        <div class="popup-content">
+            <p>❌ Invalid or expired verification link.</p>
+            <button onclick="closePopup('verificationFailedPopup')">OK</button>
+            <button onclick="resendVerification()">Resend Verification Email</button>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if show_verification_resent_popup %}
+    <div class="popup" id="verificationResentPopup">
+        <div class="popup-content">
+            <p>✅ New verification email sent! Please check your inbox.</p>
+            <button onclick="closePopup('verificationResentPopup')">OK</button>
+        </div>
+    </div>
+    {% endif %}
+
+ <!-- Displaying messages -->
+ {% if messages %}
+ <div class="messages">
+     {% for message in messages %}
+         <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+             {{ message }}
+         </div>
+     {% endfor %}
+ </div>
+ {% endif %}
+ 
+
+
+
+    <script>
+        // Function to close popup
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = "none";
+        }
+
+        // Resend verification email function (Should be linked to Django backend)
+        function resendVerification() {
+            alert("Resending verification email...");
+            // You can make an AJAX request to trigger the backend to resend the email
+        }
+
+        // Login fade-out effect
+        document.getElementById("loginLink").addEventListener("click", function(e) {
+            e.preventDefault();
+            document.body.classList.add("fade-out");
+
+            setTimeout(function() {
+                window.location.href = "{% url 'login' %}";  
+            }, 1000);
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Lost & Found Portal. Helping you reconnect with what's lost.</p>
+    </footer>
+</body>
+</html>

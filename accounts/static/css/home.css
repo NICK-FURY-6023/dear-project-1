@@ -1,0 +1,346 @@
+/* General styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Navbar Styling */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2c3e50;
+    padding: 15px 30px;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+
+/* Logo */
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Navbar Links */
+.links {
+    display: flex;
+    gap: 20px;
+    margin-right: 50px; /* Ensures proper spacing */
+}
+
+/* Link Styling */
+.links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.links a:hover {
+    background: #3498db;
+}
+
+nav a.active {
+    background: #2980b9;
+}
+
+/*underline Animation */
+.links a:hover::after {
+    transform: scaleX(1);
+}
+
+/* Intro Section */
+.intro {
+    text-align: center;
+    padding: 60px 20px;
+    background: #1abc9c;
+    color: white;
+    font-size: 22px;
+}
+
+.intro h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+/* Report Section */
+.report-section {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 40px;
+    flex-wrap: wrap;
+}
+
+.box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.box:hover {
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.report-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.view-btn {
+    background: #3498db;
+    color: white;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Recently Found Items */
+.recent-items {
+    text-align: center;
+    padding: 50px 20px;
+    background: white;
+}
+
+.recent-items h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.items-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.item-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 250px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.item-card:hover {
+    transform: scale(1.05);
+}
+
+.item-card img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.claim-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.claim-btn:hover {
+    background: #2ecc71;
+}
+
+/* How It Works Section */
+.how-it-works {
+    text-align: center;
+    background: #ecf0f1;
+    padding: 60px 20px;
+}
+
+.how-it-works h2 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #2c3e50;
+}
+
+.steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.step {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    width: 150px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+}
+
+.step:hover {
+    transform: scale(1.05);
+}
+
+.step p {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.arrow {
+    font-size: 24px;
+    color: #3498db;
+}
+
+/* Footer */
+footer {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 40px;
+}
+
+footer a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .report-section {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .steps {
+        flex-direction: column;
+    }
+}
+/* Side Menu (Fixed Properly) */
+.side-menu {
+    position: fixed;
+    right: -250px; /* Initially hidden */
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    background: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease-in-out;
+    box-shadow: -5px 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1100;
+    overflow-y: auto; /* Allows scrolling within the menu if content is large */
+}
+
+/* Prevent Menu from Scrolling Separately */
+html, body {
+    overflow-x: hidden; /* Prevents horizontal scrolling issues */
+}
+
+/* Show Menu when Active */
+.side-menu.active {
+    right: 0;
+}
+
+/* Menu Toggle Button */
+.menu-toggle {
+    position: fixed;
+    right: 15px;
+    top: 15px;
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+    z-index: 1101;
+    transition: 0.3s;
+}
+
+/* Menu Content */
+.menu-content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 60px;
+}
+
+.menu-content a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 15px 20px;
+    transition: 0.3s;
+}
+
+.menu-content a:hover {
+    background: #3498db;
+}
+
+.menu-user {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(135deg, #3498db, #6c5ce7); 
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 15px auto;
+    display: inline-block;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-in-out;
+    text-transform: capitalize;
+    letter-spacing: 1px;
+}
+
+.menu-user:hover {
+    background: linear-gradient(135deg, #6c5ce7, #3498db);
+    transform: translateY(-3px);
+}

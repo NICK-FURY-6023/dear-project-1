@@ -1,0 +1,243 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background-color: #f4f4f9;
+}
+
+
+/* General Navbar Styling */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2c3e50;
+    padding: 15px 30px;
+    color: white;
+}
+
+/* Logo Styling */
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Navbar Links */
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+/* Link Styling */
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+/* Hover Effect - Background & Underline */
+.nav-links a:hover {
+    background: #3498db;
+}
+
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 100%;
+    height: 2px;
+    background: #3498db;
+    transform: scaleX(0);
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Underline Animation */
+.nav-links a:hover::after {
+    transform: scaleX(1);
+}
+
+.register-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #ecf0f3; /* Softer background to match overall theme */
+}
+
+.register-box {
+    background: #ffffff;
+    padding: 25px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+.register-box h2 {
+    margin-bottom: 20px;
+    color: #2c3e50; /* Dark color to match navbar */
+    font-weight: 600;
+}
+
+.input-group {
+    margin: 15px 0;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #2c3e50; /* Matching text color */
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #b0bec5; /* Subtle border */
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.input-group input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+.btn {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db; /* Blue accent to match hover effect */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn:hover {
+    background-color: #2980b9; /* Slightly darker blue for hover */
+}
+
+.login-text {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.login-text a {
+    color: #3498db; /* Matching the navbar link hover */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-text a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+.messages {
+    position:fixed;
+    top: 43px;
+    right: 600px;
+    width: 300px;
+    z-index: 1000;
+}
+
+.messages ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.messages li {
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeIn 0.5s forwards, fadeOut 4s 3s forwards;
+}
+
+/* Success Message */
+.messages .success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Error Message */
+.messages .error {
+    background-color: #FF5252;
+    color: white;
+}
+
+/* Warning Message */
+.messages .warning {
+    background-color: #FF9800;
+    color: white;
+}
+
+footer {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 40px;
+}
+
+footer a {
+    color: #3498db;
+    text-decoration: none;
+}
+/* Fade In & Fade Out Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .nav-links {
+        margin-top: 10px;
+    }
+
+    .register-box {
+        width: 90%;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .register-box {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 10px;
+    }
+}

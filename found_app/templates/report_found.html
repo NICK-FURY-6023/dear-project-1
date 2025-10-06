@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Lost Item</title>
+    <link rel="stylesheet" href="{% static 'css/report_found.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header>
+        <h1>Lost & Found Portal</h1>
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'report_found' %}" class="active">Report Found Item</a>
+            <a href="{% url 'view_found' %}" >View Found Items</a>
+        </nav>
+    </header>
+
+    <!-- Form Section -->
+    <main>
+        <section class="form-section">
+            <h2>Report a found Item</h2>
+            <p>Provide details to help us find your found item.</p>
+
+            <form id="lostItemForm" action="{% url 'report_found' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="item_name">Item Name:</label>
+                    <input type="text" id="item_name" name="item_name" placeholder="e.g., Wallet, Phone" required>
+                    <span class="error-message" id="itemNameError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Describe the item..." required></textarea>
+                    <span class="error-message" id="descriptionError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select a Category</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="documents">Documents</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <span class="error-message" id="categoryError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date Found:</label>
+                    <input type="date" id="date_lost" name="date_found" required>
+                    <span class="error-message" id="dateError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" name="location" placeholder="Where did you found it?" required>
+                    <span class="error-message" id="locationError"></span>
+                </div>
+                
+
+                
+
+                <!-- Image Upload with Preview -->
+                <div class="form-group">
+                    <label for="image">Upload Image:</label>
+                    <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
+                    <div id="imagePreview" class="image-preview">
+                        <img id="previewImg" src="#" alt="Image Preview" style="display:none;">
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn">Submit Report</button>
+                    <a href="{% url 'home' %}" class="btn secondary">Back to Home</a>
+                </div>
+
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Lost & Found Portal. Reconnect with what matters.</p>
+    </footer>
+
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('previewImg');
+                output.src = reader.result;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        document.getElementById('lostItemForm').addEventListener('submit', function() {
+            alert('found item reported successfully!');
+        });
+    </script>
+</body>
+</html>

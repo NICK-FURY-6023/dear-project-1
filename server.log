@@ -7,3 +7,58 @@ October 07, 2025 - 10:57:17
 Django version 4.1.13, using settings 'lxfpro.settings'
 Starting development server at http://0.0.0.0:8000/
 Quit the server with CONTROL-C.
+/workspaces/dear-project-1/chat/urls.py changed, reloading.
+/workspaces/dear-project-1/chat/urls.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 07, 2025 - 10:59:16
+Django version 4.1.13, using settings 'lxfpro.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/workspaces/dear-project-1/lxfpro/settings.py changed, reloading.
+/workspaces/dear-project-1/lxfpro/settings.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 07, 2025 - 10:59:18
+Django version 4.1.13, using settings 'lxfpro.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/workspaces/dear-project-1/chat/api_views.py changed, reloading.
+/workspaces/dear-project-1/chat/api_views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 07, 2025 - 10:59:25
+Django version 4.1.13, using settings 'lxfpro.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/workspaces/dear-project-1/lxfpro/mongo_models.py changed, reloading.
+/workspaces/dear-project-1/lxfpro/mongo_models.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 07, 2025 - 10:59:28
+Django version 4.1.13, using settings 'lxfpro.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+/workspaces/dear-project-1/lxfpro/mongodb.py changed, reloading.
+/workspaces/dear-project-1/lxfpro/mongodb.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 07, 2025 - 10:59:29
+Django version 4.1.13, using settings 'lxfpro.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.

@@ -3,7 +3,6 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync 
 from django.contrib.auth.models import User
 from chat.models import Thread, Message
-from lxfpro.mongo_models import MongoChatMessage, MongoActivityLog
 import json
 
 
@@ -67,39 +66,11 @@ class ChatConsumer(WebsocketConsumer):
         print(f'[{self.channel_name}] - Message sent to client')
         
     def store_message(self, text):
-        # Save to SQLite (existing Django ORM)
         Message.objects.create(
             thread=self.thread_obj,
             sender=self.user,
             text=text
         )
-        
-        # Save to MongoDB Atlas for analytics and notifications
-        try:
-            # Get receiver ID (the other user in the thread)
-            receiver = self.thread_obj.first_person if self.thread_obj.second_person == self.user else self.thread_obj.second_person
-            
-            MongoChatMessage.create(
-                sender_id=self.user.id,
-                receiver_id=receiver.id,
-                message=text,
-                thread_id=str(self.thread_obj.id)
-            )
-            
-            # Log activity for notification system
-            MongoActivityLog.log(
-                user_id=self.user.id,
-                action='websocket_message',
-                details={
-                    'to_user': receiver.username,
-                    'thread_id': str(self.thread_obj.id),
-                    'preview': text[:50]
-                }
-            )
-            
-            print(f'✅ Message saved to MongoDB: {self.user.username} → {receiver.username}')
-        except Exception as e:
-            print(f'❌ MongoDB save error: {e}')
 
 
 class EchoConsumer(WebsocketConsumer):

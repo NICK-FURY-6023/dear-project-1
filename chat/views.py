@@ -3,6 +3,8 @@ from django.views import View
 from django.contrib.auth import get_user_model
 from django.shortcuts import Http404
 from chat.models import Thread, Message
+from lxfpro.mongo_models import MongoChatMessage, MongoActivityLog
+from datetime import datetime
 
 
 class ThreadView(View):
@@ -37,6 +39,27 @@ class ThreadView(View):
         data = request.POST
         user = request.user
         text = data.get("message")
+        
+        # Save to SQLite (existing)
         Message.objects.create(sender=user, thread=thread, text=text)
+        
+        # Save to MongoDB Atlas with notification
+        try:
+            MongoChatMessage.create(
+                sender_id=user.id,
+                receiver_id=self.other_user.id,
+                message=text,
+                thread_id=str(thread.id)
+            )
+            
+            # Log activity
+            MongoActivityLog.log(
+                user_id=user.id,
+                action='sent_message',
+                details={'to': self.other_user.username, 'text': text[:50]}
+            )
+        except Exception as e:
+            print(f"MongoDB save error: {e}")
+        
         context = self.get_context_data(**kwargs)
         return render(request, self.template_name, context=context)

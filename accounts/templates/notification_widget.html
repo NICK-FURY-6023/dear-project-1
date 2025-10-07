@@ -1,0 +1,341 @@
+<!-- Chat Notification Widget - Include in base template -->
+<div id="chat-notification-widget" class="notification-widget">
+    <button class="notification-btn" id="notif-btn">
+        <span class="icon">💬</span>
+        <span class="badge" id="unread-badge" style="display:none;">0</span>
+    </button>
+    
+    <div class="notification-dropdown" id="notif-dropdown" style="display:none;">
+        <div class="dropdown-header">
+            <h4>Messages</h4>
+            <button class="close-btn" id="close-dropdown">✕</button>
+        </div>
+        <div class="notification-list" id="notification-list">
+            <p class="loading">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.notification-widget {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+}
+
+.notification-btn {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+}
+
+.notification-btn .icon {
+    font-size: 28px;
+}
+
+.notification-btn .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+}
+
+.notification-dropdown {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 350px;
+    max-height: 500px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.dropdown-header h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+}
+
+.notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.notification-item {
+    padding: 12px;
+    margin: 5px 0;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid #667eea;
+}
+
+.notification-item:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateX(5px);
+}
+
+.notification-item.unread {
+    background: rgba(239, 68, 68, 0.1);
+    border-left-color: #ef4444;
+    font-weight: bold;
+}
+
+.notification-item .sender {
+    color: #667eea;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.notification-item .preview {
+    color: #333;
+    font-size: 14px;
+    margin: 5px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.notification-item .time {
+    color: #999;
+    font-size: 12px;
+}
+
+.loading, .empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+}
+
+/* Scrollbar */
+.notification-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+</style>
+
+<script>
+// Chat Notification System
+(function() {
+    const notifBtn = document.getElementById('notif-btn');
+    const notifDropdown = document.getElementById('notif-dropdown');
+    const unreadBadge = document.getElementById('unread-badge');
+    const notificationList = document.getElementById('notification-list');
+    const closeBtn = document.getElementById('close-dropdown');
+    
+    let lastCheck = null;
+    let pollInterval = null;
+    
+    // Toggle dropdown
+    notifBtn.addEventListener('click', function() {
+        const isVisible = notifDropdown.style.display !== 'none';
+        notifDropdown.style.display = isVisible ? 'none' : 'block';
+        
+        if (!isVisible) {
+            loadNotifications();
+        }
+    });
+    
+    closeBtn.addEventListener('click', function() {
+        notifDropdown.style.display = 'none';
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.notification-widget')) {
+            notifDropdown.style.display = 'none';
+        }
+    });
+    
+    // Load notifications
+    function loadNotifications() {
+        notificationList.innerHTML = '<p class="loading">Loading...</p>';
+        
+        fetch('/api/check-messages/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.new_count > 0) {
+                        displayNotifications(data.senders);
+                    } else {
+                        notificationList.innerHTML = '<p class="empty-state">No new messages 📭</p>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading notifications:', error);
+                notificationList.innerHTML = '<p class="empty-state">Error loading messages</p>';
+            });
+    }
+    
+    // Display notifications
+    function displayNotifications(messages) {
+        notificationList.innerHTML = '';
+        
+        messages.forEach(msg => {
+            const item = document.createElement('div');
+            item.className = 'notification-item unread';
+            item.innerHTML = `
+                <div class="sender">User #${msg.sender_id}</div>
+                <div class="preview">${msg.preview}</div>
+                <div class="time">Just now</div>
+            `;
+            
+            item.addEventListener('click', function() {
+                // Redirect to chat - you'll need to implement user lookup
+                window.location.href = `/chat/user_${msg.sender_id}/`;
+            });
+            
+            notificationList.appendChild(item);
+        });
+    }
+    
+    // Update unread count
+    function updateUnreadCount() {
+        fetch('/api/unread-count/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.unread_count > 0) {
+                    unreadBadge.textContent = data.unread_count;
+                    unreadBadge.style.display = 'flex';
+                } else {
+                    unreadBadge.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching unread count:', error);
+            });
+    }
+    
+    // Poll for new messages every 10 seconds
+    function startPolling() {
+        updateUnreadCount(); // Initial check
+        
+        pollInterval = setInterval(function() {
+            updateUnreadCount();
+            
+            // Check for new messages
+            const params = lastCheck ? `?last_check=${lastCheck}` : '';
+            fetch(`/api/check-messages/${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.has_new) {
+                        // Show browser notification
+                        showBrowserNotification(data.new_count);
+                        
+                        // Update badge
+                        updateUnreadCount();
+                    }
+                    lastCheck = new Date().toISOString();
+                })
+                .catch(error => {
+                    console.error('Error checking messages:', error);
+                });
+        }, 10000); // Poll every 10 seconds
+    }
+    
+    // Browser notification
+    function showBrowserNotification(count) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(`You have ${count} new message${count > 1 ? 's' : ''}`, {
+                body: 'Click to view your messages',
+                icon: '/static/images/chat-icon.png',
+                badge: '/static/images/chat-badge.png'
+            });
+        }
+    }
+    
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+    
+    // Start polling when page loads
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startPolling);
+    } else {
+        startPolling();
+    }
+})();
+</script>

@@ -164,6 +164,10 @@
     <p>&copy; 2025 Lost & Found Portal | <a href="#">About Us</a> | <a href="#">Contact</a></p>
 </footer>
 
+<!-- Chat Notification Widget -->
+{% if user.is_authenticated %}
+    {% include 'notification_widget.html' %}
+{% endif %}
 
 </body>
 </html>

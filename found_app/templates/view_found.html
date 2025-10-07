@@ -48,9 +48,27 @@
                                 <p><strong>Date Found:</strong> {{ item.date_found }}</p>
                                 <p><strong>Reported By:</strong> {{ item.user.username }}</p>
 
-                                <button onclick="openChat('{{ item.user.username }}')">
-                                    Chat with Founder
-                                </button>
+                                {% if item.is_claimed %}
+                                    <p style="color: #28a745; font-weight: 600;">✅ Already Claimed</p>
+                                {% else %}
+                                    {% if user != item.user %}
+                                        <a href="{% url 'claim_item' item.id %}" class="claim-btn" 
+                                           style="display: inline-block; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); 
+                                                  color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; 
+                                                  margin-top: 10px; font-weight: 600;">
+                                            📋 Claim This Item
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if user.is_authenticated and user != item.user %}
+                                    <a href="{% url 'chat_with_user' item.user.username %}" 
+                                       style="display: inline-block; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); 
+                                              color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; 
+                                              margin-top: 10px; margin-left: 10px; font-weight: 600;">
+                                        💬 Chat with Finder
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}
@@ -61,73 +79,5 @@
         </section>
     </main>
 
-    <!-- Chat Box -->
-    <div id="chat-box" class="chat-box" style="display: none;">
-        <div class="chat-header">
-            <span id="chat-user-name"></span>
-            <button onclick="closeChat()">❌</button>
-        </div>
-        <div class="chat-messages" id="chat-messages"></div>
-        <input type="text" id="chat-input" placeholder="Type a message...">
-        <button onclick="sendMessage()">Send</button>
-    </div>
-
-    <script>
-        let ws = null; // ✅ Declare WebSocket globally
-
-        
-function openChat(username) {
-    document.getElementById("chat-user-name").textContent = `Chat with ${username}`;
-    document.getElementById("chat-box").style.display = "block";
-
-    // ✅ Close existing WebSocket if already open
-    if (ws) {
-        ws.close();
-    }
-
-    ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${username}/`);
-
-    ws.onopen = function () {
-        console.log("✅ WebSocket connection established.");
-    };
-
-    ws.onmessage = function (event) {
-        let data = JSON.parse(event.data);
-        let chatMessages = document.getElementById("chat-messages");
-        let messageElement = document.createElement("p");
-        messageElement.textContent = `${data.username}: ${data.text}`;
-        chatMessages.appendChild(messageElement);
-    };
-
-    ws.onclose = function () {
-        console.log("❌ WebSocket connection closed.");
-    };
-
-    ws.onerror = function (error) {
-        console.error("⚠️ WebSocket error:", error);
-    };
-}
-
-function sendMessage() {
-    let messageInput = document.getElementById("chat-input");
-    let messageText = messageInput.value.trim();
-
-    if (messageText !== "" && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ message: messageText }));
-        messageInput.value = "";
-    } else {
-        console.warn("⚠️ WebSocket is not connected.");
-    }
-}
-
-function closeChat() {
-    document.getElementById("chat-box").style.display = "none";
-    if (ws) {
-        ws.close();
-    }
-}
-
-    </script>
-    
 </body>
 </html>

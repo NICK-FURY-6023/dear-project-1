@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Lost & Found Portal</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .about-section {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 40px 20px;
+        }
+        .about-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .about-header h1 {
+            font-size: 48px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .about-header p {
+            font-size: 18px;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .about-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .about-card:hover {
+            transform: translateY(-10px);
+        }
+        .about-card h3 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .about-card p {
+            color: #555;
+            line-height: 1.8;
+        }
+        .mission-vision {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .mission, .vision {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        }
+        .mission h2, .vision h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        .mission p, .vision p {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        @media (max-width: 768px) {
+            .mission-vision {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="logo">Lost & Found Portal</div>
+        <nav class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about' %}" class="active">About Us</a>
+            <a href="{% url 'contact' %}">Contact Us</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="about-header">
+            <h1>🔍 About Lost & Found Portal</h1>
+            <p>Helping students reconnect with their lost belongings through technology and community support</p>
+        </div>
+
+        <div class="about-content">
+            <div class="about-card">
+                <h3>🎯 Our Purpose</h3>
+                <p>We created this platform to solve a common problem faced by students - losing personal items on campus. Our system makes it easy to report found items and search for lost belongings.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>💡 How It Works</h3>
+                <p>Students can register using their college email, report found items with photos, and search through our database. Real-time chat helps connect finders with owners quickly.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>🔐 Secure & Private</h3>
+                <p>We verify all users through email authentication. Your personal information is protected, and we only share what's necessary to reunite items with their owners.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>🤝 Community Driven</h3>
+                <p>Built by students, for students. Every found item reported brings us closer to creating a more helpful and connected campus community.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>⚡ Real-time Updates</h3>
+                <p>Get instant notifications when items matching your search are found. Our WebSocket-based chat ensures immediate communication between parties.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>📱 Easy to Use</h3>
+                <p>Simple, intuitive interface designed for quick reporting and searching. Upload photos, add descriptions, and find your items in minutes.</p>
+            </div>
+        </div>
+
+        <!-- Mission & Vision -->
+        <div class="mission-vision">
+            <div class="mission">
+                <h2>🎯 Our Mission</h2>
+                <p>To create a transparent, efficient, and community-driven platform that helps students recover their lost items quickly and easily. We aim to reduce the stress of losing valuable belongings and promote a culture of honesty and helpfulness on campus.</p>
+            </div>
+
+            <div class="vision">
+                <h2>🌟 Our Vision</h2>
+                <p>To become the go-to platform for lost and found services in educational institutions nationwide. We envision a future where losing an item doesn't mean losing it forever, and where every campus has a reliable system for reuniting belongings with their owners.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Lost & Found Portal. Helping you reconnect with what's lost.</p>
+    </footer>
+</body>
+</html>

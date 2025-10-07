@@ -1,0 +1,253 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with {{ chat_user.username }} | Lost & Found Portal</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <style>
+        .chat-container {
+            max-width: 900px;
+            margin: 100px auto 50px;
+            padding: 0;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .message.sent {
+            align-items: flex-end;
+        }
+        .message.received {
+            align-items: flex-start;
+        }
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .message.received .message-bubble {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .message-info {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .chat-input-container {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            border-radius: 0 0 20px 20px;
+            display: flex;
+            gap: 15px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+        .back-link {
+            display: inline-block;
+            margin: 20px 0 10px 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .connection-status {
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .connection-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">Lost & Found Portal</div>
+        <nav class="links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'view_found' %}">View Found</a>
+            <a href="{% url 'about' %}">About Us</a>
+            <a href="{% url 'contact' %}">Contact Us</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+    </header>
+
+    <a href="{% url 'view_found' %}" class="back-link">← Back to Found Items</a>
+    
+    <div id="connectionStatus" class="connection-status disconnected">
+        Connecting to chat...
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>💬 Chat with {{ chat_user.username }}</h2>
+            <span>{{ chat_user.email }}</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will appear here -->
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Type your message..." 
+                   onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()" class="send-btn">Send</button>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 Lost & Found Portal. Helping you reconnect with what's lost.</p>
+    </footer>
+
+    <script>
+        const currentUser = "{{ user.username }}";
+        const chatUser = "{{ chat_user.username }}";
+        let ws = null;
+
+        function connectWebSocket() {
+            // Connect to the chat using the other user's username
+            ws = new WebSocket(`ws://${window.location.host}/ws/chat/${chatUser}/`);
+
+            ws.onopen = function() {
+                console.log("✅ WebSocket connected");
+                document.getElementById('connectionStatus').className = 'connection-status connected';
+                document.getElementById('connectionStatus').textContent = '✅ Connected';
+                setTimeout(() => {
+                    document.getElementById('connectionStatus').style.display = 'none';
+                }, 2000);
+                
+                // Load previous messages
+                loadPreviousMessages();
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                console.log('Message received:', data);
+                displayMessage(data.username, data.text, data.username === currentUser);
+            };
+
+            ws.onerror = function(error) {
+                console.error("WebSocket error:", error);
+                document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                document.getElementById('connectionStatus').textContent = '❌ Connection error';
+            };
+
+            ws.onclose = function() {
+                console.log("WebSocket closed");
+                document.getElementById('connectionStatus').className = 'connection-status disconnected';
+                document.getElementById('connectionStatus').textContent = '🔄 Reconnecting...';
+                document.getElementById('connectionStatus').style.display = 'block';
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function loadPreviousMessages() {
+            // You can fetch previous messages via AJAX here if needed
+            console.log('Chat ready for messages');
+        }
+
+        function displayMessage(username, message, isSent) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            
+            const safeMessage = escapeHtml(message);
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">${safeMessage}</div>
+                <div class="message-info">${username} • ${new Date().toLocaleTimeString()}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && ws && ws.readyState === WebSocket.OPEN) {
+                // Send plain text message
+                ws.send(message);
+                input.value = '';
+            } else if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('Chat connection is not ready. Please wait...');
+            }
+        }
+
+        // Connect on page load
+        connectWebSocket();
+    </script>
+</body>
+</html>

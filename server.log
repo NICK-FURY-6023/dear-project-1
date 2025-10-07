@@ -1,0 +1,21 @@
+nohup: ignoring input
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 06, 2025 - 20:05:29
+Django version 4.2, using settings 'lxfpro.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CONTROL-C.
+
+
+============================================================
+🔍 Verification attempt with token: 9b544b4d-1974-4dac-a8f5-dd6d62d672a2
+✅ Token found for user: nick fury
+📧 Email: mohdjunedshaikh@vpmrzshahcollege.edu.in
+🔐 Current active status: False
+✅ Account activated successfully!
+============================================================
+
+[06/Oct/2025 20:05:40] "GET /verify/9b544b4d-1974-4dac-a8f5-dd6d62d672a2/ HTTP/1.1" 302 0

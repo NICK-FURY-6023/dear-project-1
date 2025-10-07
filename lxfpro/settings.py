@@ -271,13 +271,18 @@ CHANNEL_LAYERS = {
 }
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# DUAL MODE - Sends emails via Gmail AND prints to console (Best for demo!)
+EMAIL_BACKEND = 'lxfpro.email_backend.DualEmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'lostandfound.vpmrzshah@gmail.com'
-EMAIL_HOST_PASSWORD = 'olcn hlep cryq bvag'
+EMAIL_HOST_PASSWORD = 'olcn hlep cryq bvag'  # Gmail App Password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Other options (switch karne ke liye):
+# Console Only: EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# SMTP Only: EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

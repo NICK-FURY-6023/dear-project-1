@@ -7,8 +7,11 @@ from chat.consumers import ChatConsumer, EchoConsumer
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lxfpro.settings')
 
+# Django ASGI application must be initialized before importing consumers
+django_asgi_app = get_asgi_application()
+
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter([
             path('ws/chat/<str:username>/', ChatConsumer.as_asgi()),

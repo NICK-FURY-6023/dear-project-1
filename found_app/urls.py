@@ -7,6 +7,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('report-found/', v.report_found_item, name='report_found'),
     path('view-found/', v.view_found, name='view_found'),
+    path('item/<int:item_id>/', v.item_detail, name='item_detail'),
+    path('claim/<int:item_id>/', v.claim_item, name='claim_item'),
+    path('chat/<str:username>/', v.chat_with_user, name='chat_with_user'),
     path('chat_room/', v.chat_room, name='chat_room'),
 
 

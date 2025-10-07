@@ -6,6 +6,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Found Items</title>
     <link rel="stylesheet" href="{% static 'css/view_found.css' %}">
+    <style>
+        /* Inline Chat Box Styles */
+        .chat-box {
+            margin-top: 15px;
+            border: 2px solid #17a2b8;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .close-chat {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .close-chat:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .chat-message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-message.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .chat-message.received {
+            align-self: flex-start;
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-message-info {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 3px;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: #17a2b8;
+        }
+        
+        .chat-input-area button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        .chat-input-area button:hover {
+            transform: scale(1.05);
+        }
+        
+        .connection-status {
+            padding: 5px 10px;
+            font-size: 12px;
+            text-align: center;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .connection-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
     <script src="{% static 'js/view_found.js' %}" defer></script>
 </head>
 <body>
@@ -62,14 +197,33 @@
                                 {% endif %}
 
                                 {% if user.is_authenticated and user != item.user %}
-                                    <a href="{% url 'chat_with_user' item.user.username %}" 
+                                    <button onclick="toggleChat('{{ item.id }}', '{{ item.user.username }}')" 
                                        style="display: inline-block; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); 
-                                              color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; 
+                                              color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer;
                                               margin-top: 10px; margin-left: 10px; font-weight: 600;">
                                         💬 Chat with Finder
-                                    </a>
+                                    </button>
                                 {% endif %}
                             </div>
+                            
+                            <!-- Inline Chat Box (Initially Hidden) -->
+                            {% if user.is_authenticated and user != item.user %}
+                            <div id="chat-box-{{ item.id }}" class="chat-box" style="display: none;">
+                                <div class="chat-header">
+                                    <span>💬 Chat with {{ item.user.username }}</span>
+                                    <button onclick="toggleChat('{{ item.id }}')" class="close-chat">✖</button>
+                                </div>
+                                <div id="chat-messages-{{ item.id }}" class="chat-messages">
+                                    <!-- Messages will appear here -->
+                                </div>
+                                <div class="chat-input-area">
+                                    <input type="text" id="chat-input-{{ item.id }}" 
+                                           placeholder="Type your message..." 
+                                           onkeypress="if(event.key==='Enter') sendChatMessage('{{ item.id }}', '{{ item.user.username }}')">
+                                    <button onclick="sendChatMessage('{{ item.id }}', '{{ item.user.username }}')">Send</button>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -78,6 +232,131 @@
             {% endif %}
         </section>
     </main>
+
+    <script>
+        const currentUser = "{{ user.username }}";
+        const chatConnections = {}; // Store WebSocket connections for each chat
+        
+        function toggleChat(itemId, otherUsername) {
+            const chatBox = document.getElementById(`chat-box-${itemId}`);
+            
+            if (chatBox.style.display === 'none') {
+                chatBox.style.display = 'block';
+                
+                // Initialize WebSocket connection if not already connected
+                if (!chatConnections[itemId]) {
+                    connectChat(itemId, otherUsername);
+                }
+            } else {
+                chatBox.style.display = 'none';
+            }
+        }
+        
+        function connectChat(itemId, otherUsername) {
+            const ws = new WebSocket(`ws://${window.location.host}/ws/chat/${otherUsername}/`);
+            chatConnections[itemId] = ws;
+            
+            const messagesDiv = document.getElementById(`chat-messages-${itemId}`);
+            
+            // Clear previous messages
+            messagesDiv.innerHTML = '';
+            
+            // Show connection status
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'connection-status';
+            statusDiv.id = `status-${itemId}`;
+            statusDiv.textContent = '🔄 Connecting...';
+            messagesDiv.appendChild(statusDiv);
+            
+            // Load previous messages
+            fetch(`/found/api/chat-messages/${otherUsername}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            displayChatMessage(itemId, msg.username, msg.text, msg.username === currentUser);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error loading messages:', error));
+            
+            ws.onopen = function() {
+                console.log(`✅ Connected to chat with ${otherUsername}`);
+                statusDiv.textContent = '✅ Connected';
+                statusDiv.className = 'connection-status';
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 2000);
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                console.log('Message received:', data);
+                displayChatMessage(itemId, data.username, data.text, data.username === currentUser);
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                statusDiv.textContent = '❌ Connection error';
+                statusDiv.className = 'connection-status disconnected';
+            };
+            
+            ws.onclose = function() {
+                console.log('WebSocket closed');
+                statusDiv.textContent = '🔄 Reconnecting...';
+                statusDiv.className = 'connection-status disconnected';
+                statusDiv.style.display = 'block';
+                
+                // Attempt to reconnect after 3 seconds
+                setTimeout(() => {
+                    delete chatConnections[itemId];
+                    connectChat(itemId, otherUsername);
+                }, 3000);
+            };
+        }
+        
+        function displayChatMessage(itemId, username, message, isSent) {
+            const messagesDiv = document.getElementById(`chat-messages-${itemId}`);
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isSent ? 'sent' : 'received'}`;
+            
+            const safeMessage = escapeHtml(message);
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div>${safeMessage}</div>
+                <div class="chat-message-info">${username} • ${time}</div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function sendChatMessage(itemId, otherUsername) {
+            const input = document.getElementById(`chat-input-${itemId}`);
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const ws = chatConnections[itemId];
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(message);
+                input.value = '';
+            } else {
+                alert('Chat is not connected. Please wait...');
+                // Try to reconnect
+                connectChat(itemId, otherUsername);
+            }
+        }
+    </script>
 
 </body>
 </html>

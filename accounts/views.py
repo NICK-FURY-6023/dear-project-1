@@ -131,6 +131,7 @@ def register_page(request):
         Profile.objects.create(user=user, otp=otp, otp_created_at=timezone.now())
 
         # Email with OTP
+        email_subject = "Your Verification OTP - Lost & Found Portal"
         email_body = f"""
 Hello {username},
 
@@ -148,23 +149,59 @@ Best regards,
 Lost & Found Portal Team
 """
 
+        # Try to send email with detailed error handling
+        email_sent = False
+        error_message = ""
+        
         try:
-            send_mail(
-                "Your Verification OTP - Lost & Found Portal", 
+            print("=" * 50)
+            print(f"🔧 Attempting to send OTP email...")
+            print(f"📧 To: {email}")
+            print(f"🔑 OTP: {otp}")
+            print(f"📨 From: {settings.EMAIL_HOST_USER}")
+            print(f"🌐 SMTP: {settings.EMAIL_HOST}:{settings.EMAIL_PORT}")
+            print("=" * 50)
+            
+            result = send_mail(
+                email_subject, 
                 email_body, 
-                settings.EMAIL_HOST_USER if hasattr(settings, 'EMAIL_HOST_USER') else 'noreply@lostandfound.com',
+                settings.EMAIL_HOST_USER,
                 [email],
                 fail_silently=False
             )
-            print(f"✅ OTP sent to {email}")
-            print(f"� OTP: {otp}")
-            messages.success(request, "✅ OTP sent to your email! Please check your inbox.")
-            # Redirect to OTP verification page with username
-            return redirect('verify_otp', username=username)
+            
+            if result > 0:
+                email_sent = True
+                print(f"✅ Email sent successfully! Result: {result}")
+            else:
+                print(f"⚠️ send_mail returned {result}")
+                
         except Exception as e:
-            print(f"❌ Email sending failed: {str(e)}")
-            messages.error(request, f"❌ Failed to send OTP. Error: {str(e)}")
-            return redirect('register')
+            error_message = str(e)
+            print(f"❌ Email sending failed!")
+            print(f"❌ Error type: {type(e).__name__}")
+            print(f"❌ Error message: {error_message}")
+            import traceback
+            traceback.print_exc()
+        
+        # Show appropriate message based on email status
+        if email_sent:
+            print(f"\n{'='*50}")
+            print(f"✅ SUCCESS: OTP sent to {email}")
+            print(f"🔑 OTP for testing: {otp}")
+            print(f"{'='*50}\n")
+            messages.success(request, f"✅ OTP sent to your email! Please check your inbox. (OTP: {otp})")
+        else:
+            # Even if email fails, show OTP in console for development
+            print(f"\n{'='*50}")
+            print(f"⚠️ EMAIL FAILED but here's your OTP for testing:")
+            print(f"🔑 OTP: {otp}")
+            print(f"👤 Username: {username}")
+            print(f"{'='*50}\n")
+            messages.warning(request, f"⚠️ Email delivery issue. For testing, your OTP is: {otp}")
+        
+        # Always redirect to OTP verification page
+        return redirect('verify_otp', username=username)
 
     return render(request, 'register.html')
 

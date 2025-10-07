@@ -44,12 +44,20 @@
         <div class="box">
             <h3>📢 Found something in the library, cafeteria, or classroom?</h3>
             <p>Help your fellow students by reporting it.</p>
-            <a href="#" class="btn report-btn">Report Found</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'report_found' %}" class="btn report-btn">Report Found</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn report-btn">Report Found</a>
+            {% endif %}
         </div>
         <div class="box">
             <h3>🔍 Lost your ID card, books, or project file?</h3>
             <p>Check the found items list—you might just get lucky!</p>
-            <a href="#" class="btn view-btn">View Found Items</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'view_found' %}" class="btn view-btn">View Found Items</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn view-btn">View Found Items</a>
+            {% endif %}
         </div>
     </section>
 

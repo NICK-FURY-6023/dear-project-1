@@ -1,0 +1,275 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Requests Received | Lost & Found Portal</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <style>
+        .claims-container {
+            max-width: 1200px;
+            margin: 100px auto 50px;
+            padding: 20px;
+        }
+        
+        .claims-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .claims-header h1 {
+            font-size: 36px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .claim-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #28a745;
+        }
+        
+        .new-claim {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2); }
+            50% { box-shadow: 0 5px 25px rgba(40, 167, 69, 0.4); }
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .ticket-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #28a745;
+        }
+        
+        .status-badge {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .claim-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .claimant-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .claim-reason {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .claim-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn-approve {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        
+        .btn-chat {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+        
+        .no-claims {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">Lost & Found Portal</div>
+        <nav class="links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'view_found' %}">View Found</a>
+            <a href="{% url 'my_claims' %}">My Claims</a>
+            <a href="{% url 'claim_requests_received' %}" class="active">Requests Received</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </nav>
+    </header>
+
+    <div class="claims-container">
+        <div class="claims-header">
+            <h1>📬 Claim Requests Received</h1>
+            <p>Review and respond to claim requests for your reported items</p>
+        </div>
+
+        {% if claims %}
+            {% for claim in claims %}
+            <div class="claim-card {% if claim.status == 'pending' %}new-claim{% endif %}">
+                <div class="ticket-header">
+                    <div>
+                        <div class="ticket-number">🎫 Ticket #{{ claim.ticket_number }}</div>
+                        <div style="font-size: 14px; color: #666; margin-top: 5px;">
+                            Received: {{ claim.created_at|date:"F d, Y \a\t g:i A" }}
+                        </div>
+                    </div>
+                    <div class="status-badge status-{{ claim.status }}">
+                        {% if claim.status == 'pending' %}⏳ Pending Review
+                        {% elif claim.status == 'approved' %}✅ Approved
+                        {% elif claim.status == 'rejected' %}❌ Rejected
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="claim-details">
+                    <div class="detail-item">
+                        <div class="detail-label">📦 Your Item</div>
+                        <div class="detail-value">{{ claim.item.item_name }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">📍 Location</div>
+                        <div class="detail-value">{{ claim.item.location }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">📅 Date Found</div>
+                        <div class="detail-value">{{ claim.item.date_found }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">🏷️ Category</div>
+                        <div class="detail-value">{{ claim.item.get_category_display }}</div>
+                    </div>
+                </div>
+
+                <div class="claimant-info">
+                    <div class="detail-label">👤 Claimant Information</div>
+                    <div style="margin-top: 10px;">
+                        <p><strong>Name:</strong> {{ claim.claimant.username }}</p>
+                        <p><strong>Email:</strong> {{ claim.claimant.email }}</p>
+                        <p><strong>Contact:</strong> {{ claim.contact_info }}</p>
+                    </div>
+                </div>
+
+                <div class="claim-reason">
+                    <div class="detail-label">📝 Reason for Claim</div>
+                    <p style="margin-top: 8px; color: #333;">{{ claim.reason }}</p>
+                </div>
+
+                {% if claim.status == 'pending' %}
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <strong>⚠️ Action Required:</strong>
+                    <p style="margin-top: 5px;">Please review this claim and chat with {{ claim.claimant.username }} to verify ownership before approving.</p>
+                </div>
+                {% endif %}
+
+                <div class="claim-actions">
+                    {% if claim.status == 'pending' %}
+                    <button class="action-btn btn-approve" onclick="alert('Approve feature coming soon! Please chat to verify first.')">
+                        ✅ Approve Claim
+                    </button>
+                    <button class="action-btn btn-reject" onclick="alert('Reject feature coming soon!')">
+                        ❌ Reject Claim
+                    </button>
+                    {% endif %}
+                    <a href="{% url 'chat_with_user' claim.claimant.username %}" class="action-btn btn-chat">
+                        💬 Chat with {{ claim.claimant.username }}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-claims">
+                <h2>No Claim Requests Received</h2>
+                <p>You haven't received any claim requests for your reported items yet.</p>
+                <a href="{% url 'view_found' %}" style="display: inline-block; margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                    View Your Found Items
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Lost & Found Portal. Helping you reconnect with what's lost.</p>
+    </footer>
+</body>
+</html>

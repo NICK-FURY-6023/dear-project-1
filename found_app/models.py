@@ -42,10 +42,24 @@ class ClaimRequest(models.Model):
     reason = models.TextField()  # Why they think it's their item
     contact_info = models.CharField(max_length=255)  # Phone or additional contact
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    ticket_number = models.CharField(max_length=20, unique=True, null=True, blank=True)  # Unique ticket ID
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"Claim by {self.claimant.username} for {self.item.item_name}"
+        return f"Claim #{self.ticket_number or self.id} by {self.claimant.username} for {self.item.item_name}"
+    
+    def save(self, *args, **kwargs):
+        # Generate ticket number if not exists
+        if not self.ticket_number:
+            import random
+            import string
+            # Format: CLM-YYYYMMDD-XXXX (CLM-20251007-A3B9)
+            from django.utils import timezone
+            date_str = timezone.now().strftime('%Y%m%d')
+            random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
+            self.ticket_number = f"CLM-{date_str}-{random_str}"
+        super().save(*args, **kwargs)
 
 
 class ChatMessage(models.Model):

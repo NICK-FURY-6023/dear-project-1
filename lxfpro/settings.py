@@ -296,7 +296,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'lostandfound.vpmrzshah@gmail.com'
-EMAIL_HOST_PASSWORD = 'olcn hlep cryq bvag'  # Gmail App Password
+EMAIL_HOST_PASSWORD = 'olcnhlepcryqbvag'  # Gmail App Password (removed spaces)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Other options (switch karne ke liye):

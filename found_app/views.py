@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import FoundItem
+from django.http import JsonResponse
+from chat.models import Thread, Message
+from django.contrib.auth.models import User
 
 @login_required
 def report_found_item(request):
@@ -66,6 +69,21 @@ def view_found(request):
 
 
 @login_required
+def my_claims(request):
+    """View user's claim requests (tickets)"""
+    claims = ClaimRequest.objects.filter(claimant=request.user).order_by('-created_at')
+    return render(request, 'my_claims.html', {'claims': claims})
+
+
+@login_required
+def claim_requests_received(request):
+    """View claim requests for items user has reported"""
+    my_items = FoundItem.objects.filter(user=request.user)
+    claims = ClaimRequest.objects.filter(item__in=my_items).order_by('-created_at')
+    return render(request, 'claim_requests_received.html', {'claims': claims})
+
+
+@login_required
 def item_detail(request, item_id):
     """Show detailed view of an item"""
     item = get_object_or_404(FoundItem, id=item_id)
@@ -80,9 +98,36 @@ def chat_with_user(request, username):
 
 
 @login_required
+def get_chat_messages(request, username):
+    """API endpoint to get previous chat messages"""
+    try:
+        other_user = User.objects.get(username=username)
+        thread = Thread.objects.get_or_create_personal_thread(request.user, other_user)
+        
+        messages_list = Message.objects.filter(thread=thread).order_by('created_at')
+        
+        messages_data = [{
+            'text': msg.text,
+            'username': msg.sender.username,
+            'timestamp': msg.created_at.strftime('%H:%M')
+        } for msg in messages_list]
+        
+        return JsonResponse({'messages': messages_data})
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
 def claim_item(request, item_id):
     """Handle claim request for an item"""
     item = get_object_or_404(FoundItem, id=item_id)
+    
+    # Check if item belongs to current user
+    if item.user == request.user:
+        messages.error(request, "❌ You cannot claim your own item!")
+        return redirect('view_found')
     
     if request.method == 'POST':
         reason = request.POST.get('reason')
@@ -91,10 +136,10 @@ def claim_item(request, item_id):
         # Check if user already claimed this item
         existing_claim = ClaimRequest.objects.filter(item=item, claimant=request.user).first()
         if existing_claim:
-            messages.warning(request, "You have already submitted a claim for this item!")
+            messages.warning(request, f"⚠️ You already submitted a claim! Ticket #: {existing_claim.ticket_number}")
             return redirect('view_found')
         
-        # Create claim request
+        # Create claim request (ticket number auto-generated in model)
         claim = ClaimRequest.objects.create(
             item=item,
             claimant=request.user,
@@ -102,40 +147,134 @@ def claim_item(request, item_id):
             contact_info=contact_info
         )
         
-        # Send email to item reporter
-        email_subject = f"Claim Request for {item.item_name}"
-        email_body = f"""
-Hello {item.user.username},
+        # Email to claimant (person who made the claim)
+        claimant_subject = f"Claim Request Submitted - Ticket #{claim.ticket_number}"
+        claimant_body = f"""
+Hello {request.user.username},
 
-Someone has submitted a claim request for the item you reported: {item.item_name}
+Your claim request has been successfully submitted!
 
-Claimant Details:
-- Name: {request.user.username}
-- Email: {request.user.email}
+🎫 Ticket Number: {claim.ticket_number}
+📦 Item: {item.item_name}
+📅 Submitted: {claim.created_at.strftime('%B %d, %Y at %I:%M %p')}
+📍 Location Found: {item.location}
+📝 Status: Pending Review
+
+Item Details:
+- Category: {item.get_category_display()}
+- Description: {item.description}
+- Found By: {item.user.username}
+
+Your Claim Details:
+- Reason: {reason}
 - Contact: {contact_info}
 
-Reason for Claim:
-{reason}
+What Happens Next?
+1. The person who found the item ({item.user.username}) will be notified
+2. They will review your claim request
+3. You can chat with them to discuss item details
+4. If approved, you can arrange to collect the item
 
-Please log in to your account to review this claim request and chat with the claimant.
+Please save your ticket number for reference: {claim.ticket_number}
+
+You can login to check the status of your claim or chat with the finder.
 
 Best regards,
 Lost & Found Portal Team
 """
         
+        # Email to item reporter (person who found the item)
+        reporter_subject = f"🔔 New Claim Request for {item.item_name} - Ticket #{claim.ticket_number}"
+        reporter_body = f"""
+Hello {item.user.username},
+
+Someone has submitted a claim request for the item you reported!
+
+🎫 Ticket Number: {claim.ticket_number}
+📦 Item: {item.item_name}
+📅 Claim Date: {claim.created_at.strftime('%B %d, %Y at %I:%M %p')}
+👤 Claimant: {request.user.username}
+
+Claimant Details:
+- Email: {request.user.email}
+- Contact: {contact_info}
+
+Reason for Claim:
+"{reason}"
+
+Action Required:
+1. Log in to your account: {settings.BASE_URL if hasattr(settings, 'BASE_URL') else 'http://localhost:8000'}
+2. Review the claim request (Ticket #{claim.ticket_number})
+3. Chat with {request.user.username} to verify ownership
+4. Approve or reject the claim based on verification
+
+Tips for Verification:
+- Ask specific questions about the item
+- Request description of unique features
+- Verify through the chat system
+- Check contact information
+
+Please respond to this claim request at your earliest convenience.
+
+Best regards,
+Lost & Found Portal Team
+"""
+        
+        # Send emails
+        emails_sent = {'claimant': False, 'reporter': False}
+        
+        # Send to claimant
         try:
-            send_mail(
-                email_subject,
-                email_body,
+            result = send_mail(
+                claimant_subject,
+                claimant_body,
+                settings.EMAIL_HOST_USER if hasattr(settings, 'EMAIL_HOST_USER') else 'noreply@lostandfound.com',
+                [request.user.email],
+                fail_silently=False
+            )
+            if result > 0:
+                emails_sent['claimant'] = True
+                print(f"✅ Claim confirmation sent to {request.user.email}")
+        except Exception as e:
+            print(f"⚠️ Email to claimant failed: {str(e)}")
+        
+        # Send to reporter
+        try:
+            result = send_mail(
+                reporter_subject,
+                reporter_body,
                 settings.EMAIL_HOST_USER if hasattr(settings, 'EMAIL_HOST_USER') else 'noreply@lostandfound.com',
                 [item.user.email],
                 fail_silently=False
             )
-            print(f"✅ Claim notification sent to {item.user.email}")
+            if result > 0:
+                emails_sent['reporter'] = True
+                print(f"✅ Claim notification sent to reporter {item.user.email}")
         except Exception as e:
-            print(f"❌ Email failed: {str(e)}")
+            print(f"⚠️ Email to reporter failed: {str(e)}")
         
-        messages.success(request, f"✅ Your claim request has been submitted! The item owner will be notified.")
+        # Show success message with ticket number
+        print(f"\n{'='*60}")
+        print(f"🎫 NEW CLAIM REQUEST CREATED!")
+        print(f"{'='*60}")
+        print(f"Ticket Number: {claim.ticket_number}")
+        print(f"Item: {item.item_name}")
+        print(f"Claimant: {request.user.username}")
+        print(f"Reporter: {item.user.username}")
+        print(f"Status: Pending")
+        print(f"Emails Sent: Claimant={emails_sent['claimant']}, Reporter={emails_sent['reporter']}")
+        print(f"{'='*60}\n")
+        
+        # Success message to user
+        success_msg = f"""
+        ✅ Claim request submitted successfully!<br>
+        🎫 <strong>Your Ticket Number: {claim.ticket_number}</strong><br>
+        📧 Confirmation email sent to your inbox.<br>
+        👤 The item reporter ({item.user.username}) has been notified.<br>
+        💬 You can now chat with them to verify ownership.
+        """
+        
+        messages.success(request, success_msg)
         return redirect('view_found')
     
     return render(request, 'claim_item.html', {'item': item})

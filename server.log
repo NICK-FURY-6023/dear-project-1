@@ -62,3 +62,29 @@ October 07, 2025 - 10:59:29
 Django version 4.1.13, using settings 'lxfpro.settings'
 Starting development server at http://0.0.0.0:8000/
 Quit the server with CONTROL-C.
+[07/Oct/2025 11:01:48] "GET / HTTP/1.1" 200 4906
+[07/Oct/2025 11:01:48] "GET /static/images/wallet.svg HTTP/1.1" 304 0
+[07/Oct/2025 11:01:48] "GET /static/js/script.js HTTP/1.1" 304 0
+[07/Oct/2025 11:01:48] "GET /static/css/home.css HTTP/1.1" 304 0
+Not Found: /favicon.ico
+Not Found: /favicon.ico
+[07/Oct/2025 11:01:49] "GET /favicon.ico HTTP/1.1" 404 6161
+[07/Oct/2025 11:01:51] "GET /view-found/ HTTP/1.1" 200 1984
+[07/Oct/2025 11:01:51] "GET /static/images/no-image.svg HTTP/1.1" 304 0
+[07/Oct/2025 11:01:51] "GET /static/js/view_found.js HTTP/1.1" 200 281
+[07/Oct/2025 11:01:51] "GET /static/css/view_found.css HTTP/1.1" 304 0
+[07/Oct/2025 11:02:02] "GET /report-found/ HTTP/1.1" 200 4581
+[07/Oct/2025 11:02:03] "GET /static/css/report_found.css HTTP/1.1" 304 0
+[07/Oct/2025 11:02:03] "GET /report-found/ HTTP/1.1" 200 4581
+[07/Oct/2025 11:02:04] "GET / HTTP/1.1" 200 4906
+[07/Oct/2025 11:02:07] "GET /logout/ HTTP/1.1" 302 0
+[07/Oct/2025 11:02:07] "GET /login/ HTTP/1.1" 200 2295
+[07/Oct/2025 11:02:07] "GET /static/css/login.css HTTP/1.1" 304 0
+Attempting login for: nickfury01
+Logged in user: nickfury01
+[07/Oct/2025 11:02:14] "POST /login/ HTTP/1.1" 302 0
+[07/Oct/2025 11:02:14] "GET / HTTP/1.1" 200 4906
+[07/Oct/2025 11:02:16] "GET /view-found/ HTTP/1.1" 200 1984
+[07/Oct/2025 11:02:19] "GET / HTTP/1.1" 200 4906
+[07/Oct/2025 11:02:24] "GET /item/1/ HTTP/1.1" 200 4917
+[07/Oct/2025 11:02:31] "GET / HTTP/1.1" 200 4906
